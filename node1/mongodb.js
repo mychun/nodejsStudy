@@ -30,7 +30,7 @@ let User = mongoose.model('users', userSchema)
 //操作数据库
 
 //增
-// User.insertMany({us: 'liyi', ps: '123', age: 17})
+// User.insertMany({us: 'lier', ps: '123', age: 17})
 // .then((data)=>{
 //     console.log(data)
 //     console.log('插入成功')
