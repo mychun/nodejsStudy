@@ -16,8 +16,10 @@ app.use('/public', express.static(path.join(__dirname, './public')))
 //使用路由
 const userRouter = require('./router/userRouter')
 const foodRouter = require('./router/foodRouter')
+const fileRouter = require('./router/fileRouter')
 app.use('/user', userRouter)
 app.use('/food', foodRouter)
+app.use('/file', fileRouter)
 
 //创建服务器
 app.listen(3000, ()=>{

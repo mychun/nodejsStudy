@@ -1,4 +1,3 @@
-//user路由逻辑
 const express = require('express')
 //引入user模型
 const foodModel = require('../db/model/foodModel')
