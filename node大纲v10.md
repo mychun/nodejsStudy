@@ -1238,8 +1238,54 @@ app.use('/static', express.static(path.join(__dirname, 'public')))
 > });
 > ```
 >
-### mongoose 
-> 
+### mongoose
+> 1. 下载mongoose 
+>
+>    ```js
+>    npm install mongoose --save
+>    ```
+>
+>    
+>
+> 2. 连接数据库
+>
+>    ```js
+>    var mongoose = require('mongoose');
+>    mongoose.connect('mongodb://localhost:27017/1823');
+>    var db = mongoose.connection;// 获取连接对象进行监听
+>    db.on('error',(err)=>{
+>        console.log('连接错误')
+>    });
+>    db.on('open', function() {
+>      console.log('连接ok')
+>    });
+>    ```
+>
+>    
+>
+> 3. 创建schema对象
+>
+>    ```js
+>    var UserSchema = new mongoose.Schema({
+>        name: String,
+>        pass: String,
+>        test:String
+>      });
+>    ```
+>
+>    
+>
+> 4. 将schema转化为数据模型
+>
+>    ```js
+>    let user = mongoose.model('user', UserSchema); //参数1 是集合的名字 与数据模型关联的schema对象
+>    ```
+>
+>    
+>
+> 5. 通过数据模型执行查询操作
+>
+>    [mongoose](http://mongoosejs.net/docs/)
 ### 可视化
 > * [Robo 3T](https://robomongo.org/)
 > * [Studio3t](https://studio3t.com/download-thank-you/?OS=win64)
@@ -1248,6 +1294,9 @@ app.use('/static', express.static(path.join(__dirname, 'public')))
 
 
 ## Socket
+
+* 实时刷新(蜡烛图)
+* 推送服务
 
 ### socket.io
 
@@ -1476,11 +1525,109 @@ vue 和 react 介绍
 * jsonp
 * proxy
 
+### Hui 基本使用
+
 ### 身份验证
+
+ http 请求的无状态性
 
 #### JWT
 
-#### Cookia+Session
++ 用户登录 服务器端产生一个token (加密字符串) 发送给前端 
+
++ 前端将token 进行保存  
+
++ 前端发起数据请求的时候携带token  
+
++ 服务端 验证token 是否合法  如果合法继续操作   不合法终止操作
+
++ token 的使用场景   无状态请求   保持用户的登录状态  第三方登录（token+auth2.0）  
+
+
+
+#####  非对称加密  通过私钥产生token   通过公钥解密token
+
+```js
+// 1.产生公钥和私钥
+// 产生私钥  openssl genrsa -out ./private_key.pem 1024    1024 代表私钥长度
+// 产生公钥  openssl rsa -in ./private_key.pem -pubout -out ./public_key.pem
+
+ let private_key=fs.readFileSync(path.join(__dirname,'./private_key.pem'))
+ let public_key=fs.readFileSync(path.join(__dirname,'./public_key.pem'))
+ var token = jwt.sign(palyload, private_key,{ algorithm: 'RS256'});
+ console.log(token)
+ let  token='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IueUqOaIt2lkIiwiaWF0IjoxNTUxMTUyNzk1fQ.TI_xDBvObHGAH7EV40WWpQemm5nx077Gdjq-pzDx0NWN5YFd40S7XcLmgoDdYscLM7vMOP0c7z1l83JUixqk7IBjBCU-tMNo_G5_-LGkQjV3vDYq_3TkXTl42lgmFA-EBey7W6W1PgPfYlowyHAyp-07hXaMRevgVkXm2lPEFXo'
+
+  var decoded = jwt.verify(token, public_key);
+```
+
+
+
+
+
+```js
+const jwt=require('jsonwebtoken')
+const scrict='sdjfksdjflajflasjflasjflksf'
+
+function creatToken(palyload){
+    // 产生token
+    palyload.ctime=Date.now()
+    return jwt.sign(palyload,scrict)
+}
+function checkToken(token){
+    return  new Promise((resovle,reject)=>{
+        jwt.verify(token,scrict,(err,data)=>{
+           if(err){ reject('token 验证失败')}
+           resovle(data)
+           })
+    })
+    
+}
+module.exports={
+    creatToken,checkToken
+}
+```
+
+
+
+
+
+#### Cookie+Session
+
+```js
+const  cookieParse=require('cookie-parser')
+const  session = require('express-session')
+
+app.use(session({
+	secret: 'hubwizApp', //为了安全性的考虑设置secret属性
+	cookie: {maxAge: 60 * 1000 * 60 * 24 }, //设置过期时间
+	resave: true, // 即使 session 没有被修改，也保存 session 值，默认为 true
+	saveUninitialized: false, //无论有没有session cookie，每次请求都设置个session cookie ，默认给个标示为 connect.sid
+}));
+
+```
+
+登录成功
+
+```js
+req.session.sign = true;
+req.session.name = us;
+```
+
+需要验证的接口判断是否存在
+
+注销session
+
+```js
+app.get('/out', function(req, res){
+    req.session.destroy();
+    res.redirect('/');
+})
+```
+
+
+
+
 
 ### 图片上传
 1. 安装multer模块
